@@ -1,2 +1,121 @@
-# --Image-Watermark-Tool--AI-Assisted-Development-
-A free batch watermark tool supporting text and PNG image watermarks. Select multiple pictures to preview tiled watermarks in real time, and export watermarked images with original pixel sizes in one click. All processing runs locally offline, and no images will be uploaded to servers.
+# 图片水印工具 (WatermarkTool)
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%2010%20%2F%2011-lightgrey.svg)
+![Version](https://img.shields.io/badge/version-1.1.0-green.svg)
+
+一个免费开源的批量图片水印工具，支持**文字水印**与 **PNG 图片水印**两种模式。选择多张图片，实时预览平铺水印效果，一键导出**与原图像素尺寸完全一致**的水印图。所有处理均在本地离线完成，图片不会上传到任何服务器。
+
+---
+
+## 📢 郑重声明
+
+> **本软件完全免费，任何需要付费的都是骗子！**
+>
+> 本软件由「七角松子」创作并免费发布，个人用户可**永久免费使用全部功能**，无隐藏收费、无广告、无捆绑。
+> 任何需要**付费下载、付费激活、付费购买**的渠道均为**倒卖或诈骗**，与作者无关。
+> 如您曾付费获得本软件，请立即申请退款，并可通过文末联系方式向作者举报。
+
+---
+
+## 技术摘要
+
+| 项目 | 说明 |
+|---|---|
+| 界面与渲染 | 原生 HTML5 + Canvas 2D，零前端框架、零外部依赖 |
+| 桌面壳 | [pywebview](https://pywebview.flowrl.com/)，调用系统 Edge WebView2 渲染 |
+| 打包方案 | PyInstaller 单文件 exe（`--onefile --windowed`），内嵌图标与版本信息 |
+| 运行依赖 | 仅 Edge WebView2 运行时（Win11 / 已更新 Win10 自带，启动自动检测并引导安装） |
+| 水印算法 | 以图像中心为原点旋转画布，按对角线长度铺满网格；行间距 / 列间距控制网格密度，列偏移实现奇数行错位（梅花桩）排列 |
+| 导出管线 | 全分辨率离屏 Canvas 重绘 → PNG 无损编码或 JPEG 自定义质量编码 → 原生保存对话框写盘（base64 桥接），同名文件自动追加序号防覆盖 |
+
+## 功能特性
+
+- 🖼️ **批量处理**：一次选择多张图片，缩略图切换预览，一键批量导出
+- 👁️ **实时预览**：所有参数调节即时生效，所见即所得
+- 🔤 **文字水印**：自定义文字、字体（雅黑 / 宋体 / 楷体 / 黑体等）、颜色、字号
+- 🏷️ **图片水印**：选择 PNG 图片作为水印（建议透明底），按图宽比例自动缩放
+- 🎛️ **丰富的排版参数**（两种模式均支持）：
+  - 不透明度、旋转角度（-90° ~ 90°）
+  - 行间距、列间距、**列偏移**（奇数行错位，交错梅花桩排列）
+- 📐 **尺寸不变**：导出图与原图像素尺寸完全一致
+- 💎 **质量可控**：PNG 无损输出，或 JPEG 60–100% 自定义质量
+- 💻 **双形态使用**：Windows 桌面程序（exe），或直接用浏览器打开 `index.html`
+
+## 系统要求与推荐配置
+
+**最低要求**
+
+- Windows 10 / 11（64 位）
+- Edge WebView2 运行时（程序启动时自动检测，缺失会弹出提示并引导至微软官方下载页，安装一次即可）
+- 4 GB 内存
+
+**推荐配置**
+
+- Windows 11 64 位
+- 1920 × 1080 及以上显示器（预览效果更佳）
+- 8 GB 及以上内存（批量处理 2000 万像素以上大图时更流畅）
+
+## 使用须知
+
+1. **关于"质量不变"**：导出图像素尺寸与原图严格一致。PNG 输出完全无损；JPEG 属于有损格式，任何软件添加水印都需要重新编码，建议使用默认 95% 以上质量（肉眼无差别），要求绝对无损请选择 PNG。
+2. **图片水印素材**：建议使用透明底 PNG；水印大小按"占图宽比例"缩放，因此同一参数在不同尺寸图片上视觉占比一致。
+3. **批量导出**：选择输出文件夹后自动写入，同名文件自动追加 `(1)`、`(2)` 序号，不会覆盖已有文件。
+4. **杀毒软件提示**：PyInstaller 单文件 exe 在少数杀毒软件下可能被误报（行业普遍现象），添加信任即可；不放心可自行按下文步骤从源码构建。
+5. **隐私安全**：全部计算在本机完成，无任何网络请求，不收集任何数据。
+6. **备用方案**：没有 exe 也能用——用 Chrome / Edge 浏览器直接打开 `index.html`，功能完全一致（导出走浏览器下载）。
+
+## 快速开始
+
+### 方式一：使用打包好的 exe（推荐）
+
+从 Releases 下载 `图片水印工具.exe`，双击运行即可，无需安装 Python 或任何第三方库。
+
+### 方式二：浏览器直接使用
+
+无需安装，用 Chrome / Edge 打开 `index.html` 即可使用全部功能。
+
+### 方式三：从源码运行
+
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+## 自行构建 exe
+
+```bash
+pip install -r requirements.txt
+python build.py
+```
+
+产物位于 `dist/图片水印工具.exe`（约 14 MB，免安装）。图标由脚本用 Pillow 程序化生成，构建中间文件输出到临时目录并自动清理，不污染源码树。
+
+## 项目结构
+
+```
+watermark-tool/
+├── index.html        # 全部界面与水印渲染逻辑（可独立在浏览器运行）
+├── app.py            # 桌面入口：pywebview 窗口、WebView2 检测、原生保存对话框 API
+├── build.py          # 一键构建脚本（生成图标、版本信息并调用 PyInstaller）
+├── requirements.txt  # 运行与构建依赖
+├── assets/
+│   └── icon.ico      # 应用图标（构建时自动生成）
+├── CHANGELOG.md      # 版本记录
+├── LICENSE           # MIT 开源协议
+└── dist/             # 构建产物（图片水印工具.exe）
+```
+
+## 作者
+
+- **创作人**：七角松子
+- **联系邮箱**：2476069892@qq.com
+- **QQ**：2476069892
+
+欢迎反馈问题与建议。
+
+## License
+
+本项目基于 [MIT License](LICENSE) 开源：个人用户永久免费使用全部功能，源码可自由学习、修改与再分发，惟须保留作者署名（Copyright (c) 2026 七角松子）。
+
+Copyright (c) 2026 七角松子

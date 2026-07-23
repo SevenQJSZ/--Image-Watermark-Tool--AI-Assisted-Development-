@@ -1,0 +1,6 @@
+# 运行依赖
+pywebview>=5.0
+
+# 构建依赖（仅打包 exe 时需要）
+pyinstaller>=6.0
+pillow>=10.0
